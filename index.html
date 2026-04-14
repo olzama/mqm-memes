@@ -428,9 +428,32 @@
 <body>
 
 <!-- ══════════════════════════════════════════
+     COVER SCREEN
+══════════════════════════════════════════ -->
+<div id="cover-screen" class="screen active">
+  <div class="page">
+    <div class="login-box">
+      <h1>Subtitle Evaluation</h1>
+      <p class="subtitle">MQM annotation tool</p>
+      <p style="margin-top:24px;line-height:1.7;">
+        You will evaluate English subtitle translations of iconic lines from Russian films —
+        phrases that have become cultural memes. For each item, you will see the original Russian
+        and one AI-generated translation, and judge whether anything is lost: humor, character voice,
+        register, cultural resonance.
+      </p>
+      <p style="margin-top:12px;line-height:1.7;">
+        You do not need to be a translation expert. You <em>do</em> need to read Russian and English.
+        Cultural context and an AI analysis are provided for each item.
+      </p>
+      <button class="btn btn-primary" style="margin-top:24px;" id="btn-cover-continue">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
      LOGIN SCREEN
 ══════════════════════════════════════════ -->
-<div id="login-screen" class="screen active">
+<div id="login-screen" class="screen">
   <div class="page">
     <div class="login-box">
       <h1>Subtitle Evaluation</h1>
@@ -1689,6 +1712,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-returning').style.display = '';
     document.getElementById('login-new').style.display = 'none';
   }
+
+  document.getElementById('btn-cover-continue').addEventListener('click', () => {
+    showScreen('login-screen');
+  });
 
   document.getElementById('btn-resume').addEventListener('click', () => {
     App.evaluatorId = lastId;
