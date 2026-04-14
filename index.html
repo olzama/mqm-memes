@@ -249,6 +249,7 @@
     .btn-ghost:hover { background: #eff6ff; }
 
     .btn-sm { font-size: 0.82rem; padding: 6px 12px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
     .action-row {
       display: flex;
@@ -438,14 +439,14 @@
       <p style="margin-top:24px;line-height:1.7;">
         You will evaluate English subtitle translations of iconic lines from Russian films —
         phrases that have become cultural memes. For each item, you will see the original Russian
-        and one AI-generated translation, and judge whether anything is lost: humor, character voice,
-        register, cultural resonance.
+        and one translation candidate, and judge whether anything is lost: humor, character voice,
+        register, cultural resonance, nuance. Nuance is particularly important; it is the little things that make the joke funny and the meme relatable.
       </p>
       <p style="margin-top:12px;line-height:1.7;">
-        You do not need to be a translation expert. You <em>do</em> need to read Russian and English.
-        Cultural context and an AI analysis are provided for each item.
+        Cultural context and analysis are provided for each item. You do not have to consult them, but if you are not sure how to approach a particular item, the analysis may be helpful. 
       </p>
-      <button class="btn btn-primary" style="margin-top:24px;" id="btn-cover-continue">Continue</button>
+      <button class="btn btn-ghost" style="margin-top:24px;" id="btn-cover-instructions">Read Instructions</button>
+      <button class="btn btn-primary" style="margin-top:12px;" id="btn-cover-continue" disabled>Continue</button>
     </div>
   </div>
 </div>
@@ -1611,9 +1612,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function openModal()  { document.getElementById('instructions-modal').classList.add('open'); }
   function closeModal() { document.getElementById('instructions-modal').classList.remove('open'); }
 
+  document.getElementById('btn-cover-instructions').addEventListener('click', openModal);
   document.getElementById('btn-help').addEventListener('click', openModal);
   document.getElementById('btn-modal-close').addEventListener('click', closeModal);
-  document.getElementById('btn-modal-ok').addEventListener('click', closeModal);
+  document.getElementById('btn-modal-ok').addEventListener('click', () => {
+    closeModal();
+    document.getElementById('btn-cover-continue').disabled = false;
+  });
   document.getElementById('instructions-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
