@@ -20,5 +20,20 @@
         "repeat_fraction": 0.05
       }
     }
+  },
+  "diamond-arm": {
+    "title_en": "The Diamond Arm",
+    "title_ru": "Бриллиантовая рука",
+    "youtube": "https://www.youtube.com/watch?v=MkHiu9fD820",
+    "models": {
+      "gpt-5.2": {
+        "runs_requested": 2,
+        "repeat_fraction": 0.05
+      },
+      "gpt-5.4-mini": {
+        "runs_requested": 2,
+        "repeat_fraction": 0.05
+      }
+    }
   }
 }
