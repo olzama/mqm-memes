@@ -1,0 +1,63 @@
+{
+  "title": "WALKTHROUGH — BEWARE OF THE CAR (1966)",
+  "model": "walkthrough",
+  "items": [
+    {
+      "id": 3,
+      "character": "Dima / Investigator",
+      "original": {
+        "rus": "— У кого нога?\n— Это нога! У того у кого надо нога!"
+      },
+      "reference": {
+        "eng": "Who's the one with the leg? — The right person."
+      },
+      "analysis": "The exchange plays on evasive logic and tautology. The detective simply wants to say that he trusts the person who was injured — in this context, it cannot have anything to do with the case. The translation must not focus on the leg but on the person. «У того, у кого надо» means \"the right person (has it)\" — a deliberate, deadpan evasion.",
+      "segment_number": [284],
+      "translations": {
+        "eng": {
+          "t0.8": {
+            "1": "- Whose leg?\n- The leg! The right person's leg!"
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "character": "Semyon Vassilyevich",
+      "original": {
+        "rus": "Тебя посодют, а ты не воруй!"
+      },
+      "reference": {
+        "eng": "You steal — you get locked up."
+      },
+      "analysis": "The line condenses folk morality and state threat into a blunt proverb-like sentence. The meaning is not a warning for the future despite the imperative form; the construction is closer to \"you should not have been stealing — now face the consequences.\" The comic force lies in the non-standard grammar («посодют») combined with absolute legal certainty, creating a mixture of naïveté and institutional menace.",
+      "segment_number": [414],
+      "translations": {
+        "eng": {
+          "t0.8": {
+            "1": "You'll get locked up—so don't steal!"
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "character": "Semyon Vassilyevich",
+      "original": {
+        "rus": "Свободу Юрию Деточкину! Юра!"
+      },
+      "reference": {
+        "eng": "Free Yuri Detochkin!"
+      },
+      "analysis": "The slogan mimics political protest rhetoric. Its comic and dramatic effect lies in elevating Detochkin into a symbolic dissident figure, blending parody of mass demonstrations with genuine moral sympathy.",
+      "segment_number": [637],
+      "translations": {
+        "eng": {
+          "t0.8": {
+            "1": "Freedom for Yuri Detochkin! Yura!"
+          }
+        }
+      }
+    }
+  ]
+}
