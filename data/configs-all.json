@@ -1,22 +1,33 @@
 {
-  "ivan-vas": {
-    "title_en": "Ivan Vasilievich: Back to the Future",
+  "sample-ivan-vas": {
+    "title_en": "Tutorial: Ivan Vasilievich",
     "title_ru": "Иван Васильевич меняет профессию",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
     "youtube": "https://www.youtube.com/watch?v=l7eIIIPBNUc",
     "models": {
-      "gpt-5.2": {
-        "runs_requested": 3,
+      "gpt-5-mini": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
+        "runs_requested": 2,
         "repeat_fraction": 0.05
       }
     }
   },
-  "sample-ivan-vas": {
-    "title_en": "Ivan Vasilievich (sample)",
-    "title_ru": "Иван Васильевич (sample)",
+  "ivan-vas": {
+    "title_en": "Ivan Vasilievich Changes Profession",
+    "title_ru": "Иван Васильевич меняет профессию",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
     "youtube": "https://www.youtube.com/watch?v=l7eIIIPBNUc",
     "models": {
-      "gpt-5-mini": {
-        "runs_requested": 2,
+      "gpt-5.2": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"},
+          {"lang": "Galician", "lang_code": "glg"}
+        ],
+        "runs_requested": 3,
         "repeat_fraction": 0.05
       }
     }
@@ -24,13 +35,53 @@
   "diamond-arm": {
     "title_en": "The Diamond Arm",
     "title_ru": "Бриллиантовая рука",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
     "youtube": "https://www.youtube.com/watch?v=MkHiu9fD820",
     "models": {
       "gpt-5.2": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
         "runs_requested": 2,
         "repeat_fraction": 0.05
       },
       "gpt-5.4-mini": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
+        "runs_requested": 2,
+        "repeat_fraction": 0.05
+      }
+    }
+  },
+  "pokrov-gate": {
+    "title_en": "Pokrov Gate",
+    "title_ru": "Покровские ворота",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
+    "youtube": "https://www.youtube.com/watch?v=T-EM2avmxtQ&t=2628s",
+    "models": {
+      "gpt-5.2": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
+        "runs_requested": 3,
+        "repeat_fraction": 0.05
+      }
+    }
+  },
+  "carnival-night": {
+    "title_en": "Carnival Night",
+    "title_ru": "Карнавальная ночь",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
+    "youtube": "https://www.youtube.com/watch?v=fEntSqfPC0g&t=11s",
+    "models": {
+      "gpt-5.2": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
         "runs_requested": 2,
         "repeat_fraction": 0.05
       }
