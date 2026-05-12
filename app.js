@@ -17,14 +17,22 @@ function getModelTargetLangs(film, transModel) {
   return [{ lang: 'English', lang_code: 'eng' }];
 }
 
-function formatAnalysis(analysis, langCode) {
+function formatAnalysis(analysis, langCode, showNb) {
   if (!analysis) return '';
   if (typeof analysis === 'string') return analysis;
   const g = analysis.general;
   const generalText = g ? (g.text ?? g) : '';
+  const generalNb   = (showNb && g && g.nb) ? g.nb : '';
   const ls = (analysis.language_specific || {})[langCode];
   const langText = ls ? (ls.text ?? ls) : '';
-  return [generalText, langText].filter(Boolean).join('\n\n');
+  const langNb   = (showNb && ls && ls.nb) ? ls.nb : '';
+  return [generalText, generalNb, langText, langNb].filter(Boolean).join('\n\n');
+}
+
+function srcLangProficiency() {
+  const fields = App.srcLangFields;
+  if (!fields || fields.length === 0) return 'no';
+  return (App.evaluatorMeta || {})[fields[0]] || 'no';
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -581,7 +589,7 @@ function renderCurrentItem() {
   App.viewedAnalysis = isReview ? (judgment.viewed_analysis || false) : false;
   document.getElementById('analysis-body').classList.remove('open');
   document.getElementById('btn-show-analysis').textContent = "Don't remember why this was funny? Show analysis.";
-  document.getElementById('analysis-text').textContent = formatAnalysis(item.analysis, task.target_lang_code);
+  document.getElementById('analysis-text').textContent = formatAnalysis(item.analysis, task.target_lang_code, srcLangProficiency() === 'no');
 
   // Issues: pre-populate from saved judgment when reviewing
   App.currentIssues = isReview ? judgment.issues.slice() : [];
@@ -797,7 +805,7 @@ function renderIncon() {
   const srcCode    = App.allConfigs?.[inc.film]?.source_lang_code || 'rus';
   const srcLang    = App.allConfigs?.[inc.film]?.source_lang || 'Russian';
   const original   = (item.original || {})[srcCode] || '';
-  const analysis   = formatAnalysis(item.analysis, inc.task_indices[0] != null ? App.session.tasks[inc.task_indices[0]]?.target_lang_code : null);
+  const analysis   = formatAnalysis(item.analysis, inc.task_indices[0] != null ? App.session.tasks[inc.task_indices[0]]?.target_lang_code : null, srcLangProficiency() === 'no');
   const filmDisplay = inc.film.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   // Group judgments by issues signature
