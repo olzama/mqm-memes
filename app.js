@@ -273,6 +273,8 @@ function saveSession() {
   localStorage.setItem(
     storageKey(App.evaluatorId, App.selectedFilm, App.selectedTargetLangCode),
     JSON.stringify(App.session));
+  localStorage.setItem('subtitle-eval-last-film', App.selectedFilm);
+  localStorage.setItem('subtitle-eval-last-lang', App.selectedTargetLangCode);
 }
 
 function buildNavSequence() {
@@ -1323,8 +1325,46 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === '0')     { document.getElementById('btn-no-issues').click(); }
   });
 
+  // ── Welcome screen (first screen) ─────────────────────────────
+  const LAST_ID_KEY   = 'subtitle-eval-last-id';
+  const LAST_FILM_KEY = 'subtitle-eval-last-film';
+  const LAST_LANG_KEY = 'subtitle-eval-last-lang';
+
+  {
+    const lastId   = localStorage.getItem(LAST_ID_KEY);
+    const lastFilm = localStorage.getItem(LAST_FILM_KEY);
+    const lastLang = localStorage.getItem(LAST_LANG_KEY);
+    const stored   = lastId && lastFilm && lastLang &&
+                     localStorage.getItem(storageKey(lastId, lastFilm, lastLang));
+
+    if (stored) {
+      const session = JSON.parse(stored);
+      const name = (session.evaluator_meta && session.evaluator_meta.name) || lastId;
+      document.getElementById('welcome-name-display').textContent = name;
+      document.getElementById('welcome-returning').style.display = '';
+      document.getElementById('welcome-new').style.display = 'none';
+
+      document.getElementById('btn-welcome-resume').addEventListener('click', () => {
+        App.evaluatorId            = lastId;
+        App.selectedFilm           = lastFilm;
+        App.selectedTargetLangCode = lastLang;
+        startOrResume(lastId).catch(err => { showScreen('film-screen'); showLoginError(err.message); });
+      });
+    } else {
+      // No returning session — skip welcome screen entirely for new users
+      showScreen('cover-screen');
+    }
+
+    document.getElementById('btn-welcome-new-user').addEventListener('click', () => {
+      showScreen('cover-screen');
+    });
+
+    document.getElementById('btn-welcome-start').addEventListener('click', () => {
+      showScreen('cover-screen');
+    });
+  }
+
   // ── Login ──────────────────────────────────────────────────────
-  const LAST_ID_KEY = 'subtitle-eval-last-id';
 
   // Load all configs; populate cover language labels and source-lang reg question
   fetchJSON('data/configs-all.json').then(allConfigs => {

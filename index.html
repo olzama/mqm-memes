@@ -9,9 +9,33 @@
 <body>
 
 <!-- ══════════════════════════════════════════
+     WELCOME SCREEN (first screen for all users)
+══════════════════════════════════════════ -->
+<div id="welcome-screen" class="screen active">
+  <div class="page">
+    <div class="login-box">
+      <h1>Subtitle Evaluation</h1>
+      <p class="subtitle">MQM annotation tool</p>
+
+      <!-- returning user -->
+      <div id="welcome-returning" style="display:none; margin-top:24px;">
+        <p style="font-size:0.9rem;margin-bottom:12px;">Welcome back, <strong id="welcome-name-display"></strong>.</p>
+        <button class="btn btn-primary" id="btn-welcome-resume">Resume</button>
+        <button class="btn btn-secondary" style="margin-top:8px;" id="btn-welcome-new-user">I'm a different person</button>
+      </div>
+
+      <!-- new user -->
+      <div id="welcome-new" style="margin-top:24px;">
+        <button class="btn btn-primary" id="btn-welcome-start">Get started</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
      COVER SCREEN
 ══════════════════════════════════════════ -->
-<div id="cover-screen" class="screen active">
+<div id="cover-screen" class="screen">
   <div class="page">
     <div class="login-box">
       <h1>Subtitle Evaluation</h1>
