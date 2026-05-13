@@ -572,7 +572,7 @@ function renderCurrentItem() {
 
   // Texts
   const srcCode = App.allConfigs?.[film]?.source_lang_code || 'rus';
-  const tgtCode = getModelTargetLangCode(film, tModel);
+  const tgtCode = task.target_lang_code || getModelTargetLangCode(film, tModel);
   document.getElementById('original-text').textContent = (item.original || {})[srcCode] || '';
   const trans = ((item.translations || {})[tgtCode] || {})[task.method]?.[task.run] || '';
   document.getElementById('translation-text').textContent = trans;
