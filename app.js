@@ -195,6 +195,56 @@ function buildSessionTasks(filmsModelsData, methodFilter, maxRuns, repeatFractio
 
 
 // ════════════════════════════════════════════════════════════════════
+//  NEW-METHOD DETECTION
+// ════════════════════════════════════════════════════════════════════
+
+function detectNewMethods(session, filmsModelsData, tgtCode) {
+  const sessionMethods = {};
+  for (const t of session.tasks) {
+    const key = `${t.film}/${t.trans_model}`;
+    if (!sessionMethods[key]) sessionMethods[key] = new Set();
+    sessionMethods[key].add(t.method);
+  }
+
+  const result = [];
+  for (const { film, transModel, data } of filmsModelsData) {
+    const existing = sessionMethods[`${film}/${transModel}`] || new Set();
+    const inData = new Set();
+    for (const item of data.items) {
+      for (const method of Object.keys((item.translations || {})[tgtCode] || {}))
+        inData.add(method);
+    }
+    const newMethods = [...inData].filter(m => !existing.has(m));
+    if (newMethods.length > 0)
+      result.push({ film, transModel, data, newMethods });
+  }
+  return result;
+}
+
+function promptNewMethods(methodNames) {
+  return new Promise(resolve => {
+    const modal = document.getElementById('new-methods-modal');
+    const list = methodNames.map(m => `"${m}"`).join(', ');
+    document.getElementById('new-methods-msg').textContent =
+      `New translation method(s) have been added since your last session: ${list}. ` +
+      `Would you like to add evaluation tasks for them? Your existing judgments will be preserved.`;
+    modal.classList.add('open');
+
+    function finish(result) {
+      modal.classList.remove('open');
+      document.getElementById('btn-new-methods-yes').removeEventListener('click', onYes);
+      document.getElementById('btn-new-methods-no').removeEventListener('click', onNo);
+      resolve(result);
+    }
+    function onYes() { finish(true); }
+    function onNo()  { finish(false); }
+    document.getElementById('btn-new-methods-yes').addEventListener('click', onYes);
+    document.getElementById('btn-new-methods-no').addEventListener('click', onNo);
+  });
+}
+
+
+// ════════════════════════════════════════════════════════════════════
 //  INCONSISTENCY DETECTION
 // ════════════════════════════════════════════════════════════════════
 
@@ -265,6 +315,10 @@ const App = {
   regState:                {},
 };
 
+const LAST_ID_KEY   = 'subtitle-eval-last-id';
+const LAST_FILM_KEY = 'subtitle-eval-last-film';
+const LAST_LANG_KEY = 'subtitle-eval-last-lang';
+
 function storageKey(id, film, langCode) {
   return `subtitle-eval-${id}-${film}-${langCode}`;
 }
@@ -312,8 +366,8 @@ function setLoading(msg) {
 //  DATA LOADING
 // ════════════════════════════════════════════════════════════════════
 
-async function fetchJSON(url) {
-  const r = await fetch(url);
+async function fetchJSON(url, noCache = false) {
+  const r = await fetch(url, noCache ? { cache: 'no-store' } : {});
   if (!r.ok) throw new Error(`HTTP ${r.status}: ${url}`);
   return r.json();
 }
@@ -371,10 +425,38 @@ async function loadFilmDataForSession(session) {
   const filmsModelsData = [];
   for (const { film, transModel } of pairs.values()) {
     setLoading(`Loading ${film} / ${transModel}…`);
-    const data = await fetchJSON(`data/${film}/${transModel}.json`);
+    const data = await fetchJSON(`data/${film}/${transModel}.json`, true);
     filmsModelsData.push({ film, transModel, data });
   }
   return filmsModelsData;
+}
+
+async function loadSessionFromFile(file) {
+  const errEl = document.getElementById('upload-session-error');
+  errEl.textContent = '';
+  try {
+    const text = await file.text();
+    const session = JSON.parse(text);
+    if (!session.evaluator_id || !Array.isArray(session.tasks) || !session.judgments)
+      throw new Error('Not a valid session file.');
+    const film = session.tasks[0]?.film;
+    const lang = session.tasks[0]?.target_lang_code;
+    if (!film || !lang)
+      throw new Error('Session file contains no tasks.');
+
+    const id = session.evaluator_id;
+    localStorage.setItem(storageKey(id, film, lang), JSON.stringify(session));
+    localStorage.setItem(LAST_ID_KEY, id);
+    localStorage.setItem(LAST_FILM_KEY, film);
+    localStorage.setItem(LAST_LANG_KEY, lang);
+
+    App.evaluatorId            = id;
+    App.selectedFilm           = film;
+    App.selectedTargetLangCode = lang;
+    await startOrResume(id);
+  } catch (err) {
+    errEl.textContent = err.message;
+  }
 }
 
 async function startOrResume(evaluatorId) {
@@ -390,6 +472,33 @@ async function startOrResume(evaluatorId) {
       App.selectedTargetLangCode = App.session.tasks[0]?.target_lang_code || App.selectedTargetLangCode;
       const filmsModelsData = await loadFilmDataForSession(App.session);
       App.itemsByFilm = buildItemsByFilm(filmsModelsData);
+
+      const newMethodsInfo = detectNewMethods(App.session, filmsModelsData, App.selectedTargetLangCode);
+if (newMethodsInfo.length > 0) {
+        const methodDescs = newMethodsInfo.flatMap(({ newMethods }) => newMethods);
+        const accepted = await promptNewMethods(methodDescs);
+        if (accepted) {
+          const rng = makeRNG(App.evaluatorId + '-ext');
+          let totalNew = 0;
+          for (const { film, transModel, data, newMethods } of newMethodsInfo) {
+            const modelCfg = App.allConfigs[film]?.models?.[transModel] || {};
+            const newTasks = buildSessionTasks(
+              [{ film, transModel, data }],
+              new Set(newMethods),
+              modelCfg.runs_requested  || 3,
+              modelCfg.repeat_fraction || 0.1,
+              rng,
+              App.selectedTargetLangCode
+            );
+            App.session.tasks.push(...newTasks);
+            totalNew += newTasks.filter(t => !t.is_repeat).length;
+          }
+          const methodList = newMethodsInfo.flatMap(({ newMethods }) => newMethods).join(', ');
+          App.session.new_methods_notice =
+            `${totalNew} new task(s) were added because new translation method(s) became available: ${methodList}.`;
+          saveSession();
+        }
+      }
     } else {
       // Fresh session: build tasks for selected film only
       const film    = App.selectedFilm;
@@ -408,7 +517,7 @@ async function startOrResume(evaluatorId) {
         if (!hasLang) continue;
 
         setLoading(`Loading ${film} / ${model}…`);
-        const data = await fetchJSON(`data/${film}/${model}.json`);
+        const data = await fetchJSON(`data/${film}/${model}.json`, true);
         filmsModelsData.push({ film, transModel: model, data });
         const runsRequested  = modelCfg.runs_requested  || 3;
         const repeatFraction = modelCfg.repeat_fraction || 0.1;
@@ -609,6 +718,15 @@ function renderCurrentItem() {
     prevDiv.style.display = '';
   } else {
     prevDiv.style.display = 'none';
+  }
+
+  // Session notice (e.g. new methods appended)
+  const noticeDiv = document.getElementById('session-notice');
+  if (App.session.new_methods_notice) {
+    document.getElementById('session-notice-text').textContent = App.session.new_methods_notice;
+    noticeDiv.style.display = '';
+  } else {
+    noticeDiv.style.display = 'none';
   }
 
   // Clear add-issue form
@@ -921,16 +1039,23 @@ function showComplete() {
   const skipped  = s.skipped.length;
   document.getElementById('complete-stats').textContent =
     `${judged} items judged · ${skipped} skipped · session for evaluator "${s.evaluator_id}"`;
-
+  downloadSession();
 }
 
 function downloadSession() {
-  const json = JSON.stringify(App.session, null, 2) + '\n';
+  const s    = App.session;
+  const date = new Date().toISOString().slice(0, 10);
+  const film = (App.selectedFilm || s.tasks[0]?.film || 'unknown').replace(/[^a-z0-9_-]/gi, '-');
+  const lang = (App.selectedTargetLangCode || s.tasks[0]?.target_lang_code || 'unk');
+  const id   = (s.evaluator_id || 'unknown').replace(/[^a-z0-9_-]/gi, '-');
+  const filename = `mqm-eval-${id}-${film}-${lang}-${date}.json`;
+
+  const json = JSON.stringify(s, null, 2) + '\n';
   const blob = new Blob([json], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = 'session.json';
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1052,8 +1177,9 @@ function prepareLoginForSelectedFilm() {
   const srcLang = filmCfg?.source_lang   || 'Russian';
 
   // Show returning-user banner only if a session exists for this specific film+lang
-  const lastId = localStorage.getItem('subtitle-eval-last-id');
-  const existingRaw = lastId && localStorage.getItem(storageKey(lastId, film, App.selectedTargetLangCode));
+  // and the user hasn't declared themselves a different person (App.evaluatorId cleared)
+  const lastId = App.evaluatorId || localStorage.getItem('subtitle-eval-last-id');
+  const existingRaw = App.evaluatorId && lastId && localStorage.getItem(storageKey(lastId, film, App.selectedTargetLangCode));
   if (existingRaw) {
     const stored = JSON.parse(existingRaw);
     const name = (stored.evaluator_meta && stored.evaluator_meta.name) || lastId;
@@ -1326,9 +1452,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Welcome screen (first screen) ─────────────────────────────
-  const LAST_ID_KEY   = 'subtitle-eval-last-id';
-  const LAST_FILM_KEY = 'subtitle-eval-last-film';
-  const LAST_LANG_KEY = 'subtitle-eval-last-lang';
+  // (defined at module level — see top of file)
 
   {
     const lastId   = localStorage.getItem(LAST_ID_KEY);
@@ -1350,18 +1474,29 @@ document.addEventListener('DOMContentLoaded', () => {
         App.selectedTargetLangCode = lastLang;
         startOrResume(lastId).catch(err => { showScreen('film-screen'); showLoginError(err.message); });
       });
-    } else {
-      // No returning session — skip welcome screen entirely for new users
-      showScreen('cover-screen');
     }
+    // New users stay on welcome screen (welcome-new div is visible by default)
 
     document.getElementById('btn-welcome-new-user').addEventListener('click', () => {
+      App.evaluatorId = null;
       showScreen('cover-screen');
     });
 
     document.getElementById('btn-welcome-start').addEventListener('click', () => {
       showScreen('cover-screen');
     });
+
+    const uploadInput = document.getElementById('upload-session-input');
+    uploadInput.addEventListener('change', () => {
+      if (uploadInput.files[0]) {
+        loadSessionFromFile(uploadInput.files[0]);
+        uploadInput.value = '';
+      }
+    });
+    document.getElementById('btn-upload-session-new').addEventListener('click',
+      () => uploadInput.click());
+    document.getElementById('btn-upload-session-ret').addEventListener('click',
+      () => uploadInput.click());
   }
 
   // ── Login ──────────────────────────────────────────────────────
@@ -1449,9 +1584,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-film-continue').addEventListener('click', () => {
-    const tgtLang = App.selectedTargetLang || 'English';
-    document.querySelectorAll('.onb-tgt-lang').forEach(el => el.textContent = tgtLang);
-    openOnboarding();
+    if (App.evaluatorId) {
+      startOrResume(App.evaluatorId).catch(err => { showScreen('film-screen'); showLoginError(err.message); });
+    } else {
+      const tgtLang = App.selectedTargetLang || 'English';
+      document.querySelectorAll('.onb-tgt-lang').forEach(el => el.textContent = tgtLang);
+      openOnboarding();
+    }
   });
 
   document.getElementById('btn-resume').addEventListener('click', () => {
@@ -1461,6 +1600,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-new-user').addEventListener('click', () => {
+    App.evaluatorId = null;
     document.getElementById('login-returning').style.display = 'none';
     document.getElementById('login-new').style.display = '';
   });
@@ -1567,6 +1707,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCurrentItem();
   });
 
+  // ── Session notice dismiss ─────────────────────────────────────
+  document.getElementById('btn-dismiss-notice').addEventListener('click', () => {
+    delete App.session.new_methods_notice;
+    saveSession();
+    document.getElementById('session-notice').style.display = 'none';
+  });
+
   // ── Review: re-evaluate add issue ──────────────────────────────
   document.getElementById('btn-re-add').addEventListener('click', () =>
     addIssueFromForm('re-sev-group', 're-cat-group', 're-just-input',
@@ -1597,6 +1744,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderIncon();
   });
 
-  // ── Complete: download ─────────────────────────────────────────
+  // ── Complete: download / navigate ──────────────────────────────
   document.getElementById('btn-download').addEventListener('click', downloadSession);
+  document.getElementById('btn-evaluate-another').addEventListener('click', () => {
+    App.session = null;
+    showFilmSelectionScreen();
+  });
 });

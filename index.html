@@ -22,12 +22,22 @@
         <p style="font-size:0.9rem;margin-bottom:12px;">Welcome back, <strong id="welcome-name-display"></strong>.</p>
         <button class="btn btn-primary" id="btn-welcome-resume">Resume</button>
         <button class="btn btn-secondary" style="margin-top:8px;" id="btn-welcome-new-user">I'm a different person</button>
+        <div style="margin-top:8px;">
+          <button class="btn btn-ghost btn-sm" id="btn-upload-session-ret">Upload a different session</button>
+        </div>
       </div>
 
       <!-- new user -->
       <div id="welcome-new" style="margin-top:24px;">
         <button class="btn btn-primary" id="btn-welcome-start">Get started</button>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" id="btn-upload-session-new">Upload previous session</button>
+        </div>
       </div>
+
+      <!-- shared file input + error -->
+      <input type="file" id="upload-session-input" accept=".json" style="display:none;">
+      <p class="login-error" id="upload-session-error"></p>
     </div>
   </div>
 </div>
@@ -153,6 +163,15 @@
   </div>
 
   <div class="page">
+    <!-- Session notice (e.g. new methods added) -->
+    <div id="session-notice" class="card" style="display:none; border-color:#bfdbfe;">
+      <div class="card-label">Session updated</div>
+      <div id="session-notice-text" style="font-size:0.9rem;color:var(--muted);"></div>
+      <div class="action-row" style="margin-top:8px;">
+        <button class="btn btn-ghost btn-sm" id="btn-dismiss-notice">Dismiss</button>
+      </div>
+    </div>
+
     <!-- Previous item summary (shown after saving) -->
     <div id="prev-summary" class="card" style="display:none; border-color:#bbf7d0;">
       <div class="card-label">Previous item saved</div>
@@ -285,7 +304,12 @@
 
     <div class="card" style="margin-top:24px; text-align:left;">
       <div class="card-label">Download &amp; submit</div>
-      <button class="btn btn-primary" id="btn-download">Download session.json</button>
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:10px;">Your session file was downloaded automatically. Use the button below if you need it again.</p>
+      <button class="btn btn-secondary" id="btn-download">Download again</button>
+    </div>
+
+    <div style="margin-top:16px;">
+      <button class="btn btn-ghost" id="btn-evaluate-another">Evaluate another film &#8594;</button>
     </div>
 
     <p style="margin-top:16px; font-size:0.88rem; color:var(--muted);">
@@ -366,6 +390,20 @@
         <span id="wt-counter" style="font-size:0.83rem;color:var(--muted);"></span>
         <button class="btn btn-primary" id="btn-wt-next">Next</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NEW METHODS MODAL
+══════════════════════════════════════════ -->
+<div id="new-methods-modal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h2>New translations available</h2>
+    <p id="new-methods-msg"></p>
+    <div style="margin-top:20px; display:flex; gap:8px;">
+      <button class="btn btn-primary" id="btn-new-methods-yes">Add to my session</button>
+      <button class="btn btn-secondary" id="btn-new-methods-no">Skip</button>
     </div>
   </div>
 </div>
