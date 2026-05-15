@@ -1179,7 +1179,7 @@ function prepareLoginForSelectedFilm() {
   // Show returning-user banner only if a session exists for this specific film+lang
   // and the user hasn't declared themselves a different person (App.evaluatorId cleared)
   const lastId = App.evaluatorId || localStorage.getItem('subtitle-eval-last-id');
-  const existingRaw = App.evaluatorId && lastId && localStorage.getItem(storageKey(lastId, film, App.selectedTargetLangCode));
+  const existingRaw = lastId && localStorage.getItem(storageKey(lastId, film, App.selectedTargetLangCode));
   if (existingRaw) {
     const stored = JSON.parse(existingRaw);
     const name = (stored.evaluator_meta && stored.evaluator_meta.name) || lastId;
