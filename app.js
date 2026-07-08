@@ -1048,7 +1048,7 @@ function downloadSession() {
   const film = (App.selectedFilm || s.tasks[0]?.film || 'unknown').replace(/[^a-z0-9_-]/gi, '-');
   const lang = (App.selectedTargetLangCode || s.tasks[0]?.target_lang_code || 'unk');
   const id   = (s.evaluator_id || 'unknown').replace(/[^a-z0-9_-]/gi, '-');
-  const filename = `mqm-eval-${id}-${film}-${lang}-${date}.json`;
+  const filename = `human_${id}-${film}-${lang}-${date}.json`;
 
   const json = JSON.stringify(s, null, 2) + '\n';
   const blob = new Blob([json], { type: 'application/json' });

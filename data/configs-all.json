@@ -71,6 +71,22 @@
       }
     }
   },
+  "gentelmen": {
+    "title_en": "Gentlemen of Fortune",
+    "title_ru": "Джентльмены удачи",
+    "source_lang": "Russian",
+    "source_lang_code": "rus",
+    "youtube": "",
+    "models": {
+      "gpt-5.2": {
+        "target_langs": [
+          {"lang": "English", "lang_code": "eng"}
+        ],
+        "runs_requested": 2,
+        "repeat_fraction": 0.05
+      }
+    }
+  },
   "carnival-night": {
     "title_en": "Carnival Night",
     "title_ru": "Карнавальная ночь",
