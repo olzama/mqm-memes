@@ -224,9 +224,8 @@ function detectNewMethods(session, filmsModelsData, tgtCode) {
 function promptNewMethods(methodNames) {
   return new Promise(resolve => {
     const modal = document.getElementById('new-methods-modal');
-    const list = methodNames.map(m => `"${m}"`).join(', ');
     document.getElementById('new-methods-msg').textContent =
-      `New translation method(s) have been added since your last session: ${list}. ` +
+      `New translations have been added since your last session. ` +
       `Would you like to add evaluation tasks for them? Your existing judgments will be preserved.`;
     modal.classList.add('open');
 
@@ -431,7 +430,7 @@ async function loadFilmDataForSession(session) {
   }
   const filmsModelsData = [];
   for (const { film, transModel } of pairs.values()) {
-    setLoading(`Loading ${film} / ${transModel}…`);
+    setLoading('Loading translations…');
     const data = await fetchJSON(`data/${film}/${transModel}.json`, true);
     filmsModelsData.push({ film, transModel, data });
   }
@@ -512,9 +511,8 @@ if (newMethodsInfo.length > 0) {
             App.session.tasks.push(...newTasks);
             totalNew += newTasks.filter(t => !t.is_repeat).length;
           }
-          const methodList = newMethodsInfo.flatMap(({ newMethods }) => newMethods).join(', ');
           App.session.new_methods_notice =
-            `${totalNew} new task(s) were added because new translation method(s) became available: ${methodList}.`;
+            `${totalNew} new task(s) were added because new translations became available.`;
           saveSession();
         }
       }
@@ -535,7 +533,7 @@ if (newMethodsInfo.length > 0) {
         const hasLang = modelLangs.some(tl => tl.lang_code === tgtCode);
         if (!hasLang) continue;
 
-        setLoading(`Loading ${film} / ${model}…`);
+        setLoading('Loading translations…');
         const data = await fetchJSON(`data/${film}/${model}.json`, true);
         filmsModelsData.push({ film, transModel: model, data });
         const runsRequested  = modelCfg.runs_requested  || 3;
