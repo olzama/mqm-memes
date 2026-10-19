@@ -67,7 +67,11 @@ def test_all_configured_lang_pairs_shown(page: Page):
 
 def test_film_list_hidden_before_lang_pair(page: Page):
     _reach_film_screen(page)
-    assert not page.locator("#film-list-group").is_visible()
+    # With a single language pair the app selects it and shows the films at once.
+    if page.locator("#lang-pair-buttons .btn-toggle").count() == 1:
+        assert page.locator("#film-list-group").is_visible()
+    else:
+        assert not page.locator("#film-list-group").is_visible()
 
 
 def test_selecting_lang_pair_shows_films(page: Page):

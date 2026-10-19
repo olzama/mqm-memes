@@ -472,6 +472,18 @@ async function startOrResume(evaluatorId) {
     const newKey = storageKey(evaluatorId, App.selectedFilm, App.selectedTargetLangCode);
     let stored = localStorage.getItem(newKey);
 
+    // A stored session built from translation models that are no longer configured
+    // for this film is set aside (kept under an archive key) and a fresh one is built.
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const filmModels = App.allConfigs?.[App.selectedFilm]?.models || {};
+      if ((parsed.tasks || []).some(t => !(t.trans_model in filmModels))) {
+        localStorage.setItem(`${newKey}-archived-${Date.now()}`, stored);
+        localStorage.removeItem(newKey);
+        stored = null;
+      }
+    }
+
     if (stored) {
       App.session = JSON.parse(stored);
       // Derive selection state from stored session
