@@ -583,7 +583,7 @@ def test_trans_context_button_visible_when_data_available(page: Page):
     has_data = page.evaluate("""
         () => {
             const { task } = App.navSequence[App.sliderPos - 1];
-            const subs = (App.transSubsByFilm[task.film] || {})[task.trans_model]?.[task.method];
+            const subs = (App.transSubsByFilm[task.film] || {})[task.trans_model]?.[`${task.method}\x00${task.run}`];
             return !!subs;
         }
     """)

@@ -400,19 +400,26 @@ async function loadTransSubsForSession(tasks) {
   // Collect unique (film, transModel, method) combos from all tasks
   const seen = new Set();
   for (const t of tasks) {
-    seen.add(`${t.film}\x00${t.trans_model}\x00${t.method}`);
+    seen.add(`${t.film}\x00${t.trans_model}\x00${t.method}\x00${t.run}`);
   }
   for (const key of seen) {
-    const [film, transModel, method] = key.split('\x00');
-    if ((App.transSubsByFilm[film] || {})[transModel]?.[method]) continue;
+    const [film, transModel, method, run] = key.split('\x00');
+    const subsKey = `${method}\x00${run}`;
+    if ((App.transSubsByFilm[film] || {})[transModel]?.[subsKey]) continue;
+    // Prefer the per-run file; fall back to the per-method file (run 1 only).
+    let subs = null;
     try {
-      const subs = await fetchJSON(`data/${film}/${transModel}-${method}-subs.json`);
-      if (!App.transSubsByFilm[film]) App.transSubsByFilm[film] = {};
-      if (!App.transSubsByFilm[film][transModel]) App.transSubsByFilm[film][transModel] = {};
-      App.transSubsByFilm[film][transModel][method] = subs;
+      subs = await fetchJSON(`data/${film}/${transModel}-${method}-${run}-subs.json`);
     } catch (_) {
-      // optional; context button will be hidden for this method
+      if (String(run) === '1') {
+        try { subs = await fetchJSON(`data/${film}/${transModel}-${method}-subs.json`); } catch (_) {}
+      }
     }
+    // optional; context button will be hidden when no file exists for this run
+    if (!subs) continue;
+    if (!App.transSubsByFilm[film]) App.transSubsByFilm[film] = {};
+    if (!App.transSubsByFilm[film][transModel]) App.transSubsByFilm[film][transModel] = {};
+    App.transSubsByFilm[film][transModel][subsKey] = subs;
   }
 }
 
@@ -610,7 +617,7 @@ function renderContextSegments(film, item, windowBefore = 3, windowAfter = 2) {
 function renderTranslationContext(film, transModel, method, run, item, windowBefore = 3, windowAfter = 2) {
   const listEl = document.getElementById('trans-context-segments');
   const btnEl  = document.getElementById('btn-show-trans-context');
-  const subs   = (App.transSubsByFilm[film] || {})[transModel]?.[method];
+  const subs   = (App.transSubsByFilm[film] || {})[transModel]?.[`${method}\x00${run}`];
   const segs   = item.segment_number;
 
   if (!subs || !segs || segs.length === 0) {

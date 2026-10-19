@@ -13,7 +13,17 @@
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 2,
+        "runs_requested": 1,
+        "repeat_fraction": 0.05
+      },
+      "claude-opus-5-5": {
+        "target_langs": [
+          {
+            "lang": "English",
+            "lang_code": "eng"
+          }
+        ],
+        "runs_requested": 1,
         "repeat_fraction": 0.05
       }
     }
@@ -32,7 +42,17 @@
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 2,
+        "runs_requested": 1,
+        "repeat_fraction": 0.05
+      },
+      "claude-opus-5-5": {
+        "target_langs": [
+          {
+            "lang": "English",
+            "lang_code": "eng"
+          }
+        ],
+        "runs_requested": 1,
         "repeat_fraction": 0.05
       }
     }
@@ -51,7 +71,17 @@
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 2,
+        "runs_requested": 1,
+        "repeat_fraction": 0.05
+      },
+      "claude-opus-5-5": {
+        "target_langs": [
+          {
+            "lang": "English",
+            "lang_code": "eng"
+          }
+        ],
+        "runs_requested": 1,
         "repeat_fraction": 0.05
       }
     }
@@ -70,7 +100,17 @@
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 2,
+        "runs_requested": 1,
+        "repeat_fraction": 0.05
+      },
+      "claude-opus-5-5": {
+        "target_langs": [
+          {
+            "lang": "English",
+            "lang_code": "eng"
+          }
+        ],
+        "runs_requested": 1,
         "repeat_fraction": 0.05
       }
     }
@@ -89,7 +129,17 @@
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 2,
+        "runs_requested": 1,
+        "repeat_fraction": 0.05
+      },
+      "claude-opus-5-5": {
+        "target_langs": [
+          {
+            "lang": "English",
+            "lang_code": "eng"
+          }
+        ],
+        "runs_requested": 1,
         "repeat_fraction": 0.05
       }
     }
