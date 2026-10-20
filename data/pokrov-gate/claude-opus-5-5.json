@@ -40,6 +40,9 @@
           },
           "zero": {
             "1": "And who doesn't drink? Name one! No, I'm waiting."
+          },
+          "meme-search": {
+            "1": "And who doesn't drink? Name one!\nNo, I'm waiting."
           }
         }
       }
@@ -82,6 +85,9 @@
           },
           "zero": {
             "1": "how about\nwe knock back a little glass?"
+          },
+          "meme-search": {
+            "1": "how about a quick one?"
           }
         }
       }
@@ -130,6 +136,9 @@
           },
           "zero": {
             "1": "Lofty... Lofty relations."
+          },
+          "meme-search": {
+            "1": "Such... such lofty relations."
           }
         }
       }
@@ -172,6 +181,9 @@
           },
           "zero": {
             "1": "We don't live for joy, we live for conscience."
+          },
+          "meme-search": {
+            "1": "We live not for joy, but for conscience."
           }
         }
       }
@@ -214,6 +226,9 @@
           },
           "zero": {
             "1": "Note, it wasn't me who suggested it."
+          },
+          "meme-search": {
+            "1": "Mind you, I wasn't the one who suggested it."
           }
         }
       }
@@ -261,6 +276,9 @@
           },
           "zero": {
             "1": "Cook!"
+          },
+          "meme-search": {
+            "1": "Master chef!"
           }
         }
       }
@@ -309,6 +327,9 @@
           },
           "zero": {
             "1": "Natürlich."
+          },
+          "meme-search": {
+            "1": "Natürlich, Margarita Pavlovna."
           }
         }
       }
@@ -351,6 +372,9 @@
           },
           "zero": {
             "1": "Cut the damn thing out.\nDon't wait for peritonitis."
+          },
+          "meme-search": {
+            "1": "Cut it out, damn it,\ndon't wait for the peritonitises!"
           }
         }
       }
@@ -393,6 +417,9 @@
             "1": "Khobotov, that's petty!"
           },
           "zero": {
+            "1": "Khobotov, that's petty!"
+          },
+          "meme-search": {
             "1": "Khobotov, that's petty!"
           }
         }
@@ -442,6 +469,9 @@
           },
           "zero": {
             "1": "He's my cross!\nAnd it's mine to bear."
+          },
+          "meme-search": {
+            "1": "He's my cross!\nAnd mine to bear."
           }
         }
       }
@@ -490,6 +520,9 @@
           },
           "zero": {
             "1": "Oh, I'm so awkward,\nso gawky...\nSo full of contradictions!"
+          },
+          "meme-search": {
+            "1": "Ah, I'm so awkward... so angular,\nall of me...\nSo contradictory, all of me!"
           }
         }
       }
