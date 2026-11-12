@@ -83,24 +83,14 @@
     "source_lang_code": "rus",
     "youtube": "https://www.youtube.com/watch?v=T-EM2avmxtQ&t=2628s",
     "models": {
-      "gpt-6-sol": {
+      "gpt-5.2": {
         "target_langs": [
           {
             "lang": "English",
             "lang_code": "eng"
           }
         ],
-        "runs_requested": 1,
-        "repeat_fraction": 0.05
-      },
-      "claude-opus-5-5": {
-        "target_langs": [
-          {
-            "lang": "English",
-            "lang_code": "eng"
-          }
-        ],
-        "runs_requested": 1,
+        "runs_requested": 3,
         "repeat_fraction": 0.05
       }
     }
