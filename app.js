@@ -465,21 +465,51 @@ async function loadSessionFromFile(file) {
   }
 }
 
+// Newest archived session under `key` whose tasks all use configured models, or null.
+function findRestorableArchive(key, filmModels) {
+  const prefix = `${key}-archived-`;
+  let bestKey = null, bestTime = -1;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(prefix)) continue;
+    const time = Number(k.slice(prefix.length));
+    if (!(time > bestTime)) continue;
+    try {
+      const tasks = JSON.parse(localStorage.getItem(k)).tasks || [];
+      if (tasks.length && tasks.every(t => t.trans_model in filmModels)) {
+        bestKey = k;
+        bestTime = time;
+      }
+    } catch (e) { /* unreadable archive: skip */ }
+  }
+  return bestKey;
+}
+
 async function startOrResume(evaluatorId) {
   showScreen('loading-screen');
   try {
     const newKey = storageKey(evaluatorId, App.selectedFilm, App.selectedTargetLangCode);
     let stored = localStorage.getItem(newKey);
+    const filmModels = App.allConfigs?.[App.selectedFilm]?.models || {};
 
     // A stored session built from translation models that are no longer configured
     // for this film is set aside (kept under an archive key) and a fresh one is built.
     if (stored) {
       const parsed = JSON.parse(stored);
-      const filmModels = App.allConfigs?.[App.selectedFilm]?.models || {};
       if ((parsed.tasks || []).some(t => !(t.trans_model in filmModels))) {
         localStorage.setItem(`${newKey}-archived-${Date.now()}`, stored);
         localStorage.removeItem(newKey);
         stored = null;
+      }
+    }
+
+    // If an archived session fits the current models again, resume it instead.
+    // The archive copy is kept.
+    if (!stored) {
+      const archiveKey = findRestorableArchive(newKey, filmModels);
+      if (archiveKey) {
+        stored = localStorage.getItem(archiveKey);
+        localStorage.setItem(newKey, stored);
       }
     }
 
